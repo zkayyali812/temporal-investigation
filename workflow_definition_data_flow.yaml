@@ -1,0 +1,59 @@
+# Data Flow Workflow Example - demonstrates passing data between nodes
+workflowName: "Data Flow Example Workflow"
+execution:
+  type: "sequential"
+  blocks:
+    # Step 1: Initialize and get user data
+    - type: "activity"
+      activityName: "InitializeWorkflow"
+      args:
+        - "data-flow-demo"
+    
+    # Step 2: Use initialization result to validate input
+    - type: "activity"
+      activityName: "ValidateInput"
+      args:
+        - "user_credentials"
+    
+    # Step 3: Request approval with validation results
+    - type: "activity"
+      activityName: "RequestHumanApproval"
+      args:
+        - "ProcessData"
+    
+    # Step 4: Process data using previous results
+    - type: "sequential"
+      blocks:
+        - type: "activity"
+          activityName: "ExtractData"
+          args:
+            - "source_database"
+        
+        - type: "activity"
+          activityName: "TransformData"
+          args:
+            - "business_rules"
+        
+        - type: "activity"
+          activityName: "LoadData"
+          args:
+            - "target_warehouse"
+    
+    # Step 5: Generate report with all accumulated data
+    - type: "activity"
+      activityName: "GenerateFinalReport"
+      args:
+        - "comprehensive_summary"
+    
+    # Step 6: Send notification with report data
+    - type: "activity"
+      activityName: "SendCompletionNotification"
+      args:
+        - "success"
+        - "data-team@company.com"
+    
+    # Step 7: Cleanup with execution summary
+    - type: "activity"
+      activityName: "CleanupResources"
+      args:
+        - "temp_processing_files"
