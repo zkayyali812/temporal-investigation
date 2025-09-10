@@ -1,7 +1,8 @@
 import asyncio
 import sys
 import uuid
-from temporalio.client import Client
+from temporalio.client import Client, Schedule, ScheduleActionStartWorkflow, ScheduleSpec, ScheduleIntervalSpec, ScheduleState, SchedulePolicy, ScheduleOverlapPolicy
+from datetime import timedelta
 
 from src.workflows.sample_workflow import SampleWorkflow
 
@@ -62,19 +63,24 @@ async def main():
         # Cron Schedule feature when starting the workflow.
         print("Starting scheduler simulation. Press Ctrl+C to stop.")
         print("A new workflow will be started every 15 seconds.")
-        try:
-            while True:
-                workflow_id = f"scheduled-workflow-{uuid.uuid4()}"
-                print(f"\nScheduler: Starting workflow {workflow_id}")
-                await client.start_workflow(
+        await client.create_schedule(
+            "workflow-schedule-id",
+            Schedule(
+                action=ScheduleActionStartWorkflow(
                     SampleWorkflow.run,
-                    f"Scheduled task run at {asyncio.to_thread(lambda: __import__('datetime').datetime.now())}",
-                    id=workflow_id,
+                    "my schedule arg",
+                    id=f"scheduled-workflow-id",
                     task_queue=TASK_QUEUE,
+                ),
+                spec=ScheduleSpec(
+                    intervals=[ScheduleIntervalSpec(every=timedelta(seconds=15))]
+                ),
+                state=ScheduleState(note="Here's a note on my Schedule."),
+                policy=SchedulePolicy(
+                    overlap=ScheduleOverlapPolicy.ALLOW_ALL
                 )
-                await asyncio.sleep(15)
-        except KeyboardInterrupt:
-            print("\nScheduler stopped.")
+            ),
+        )
 
     else:
         print("Unknown action.")
