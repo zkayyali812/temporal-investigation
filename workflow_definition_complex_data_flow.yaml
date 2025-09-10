@@ -1,0 +1,128 @@
+# Complex Data Flow Workflow - demonstrates advanced data passing patterns
+workflowName: "Complex Data Flow Multi-Stage Workflow"
+execution:
+  type: "sequential"
+  blocks:
+    # Initial setup phase with data collection
+    - type: "activity"
+      activityName: "InitializeWorkflow"
+      args:
+        - "complex-data-flow-v1"
+    
+    # Parallel validation phase - each gets initialization data
+    - type: "parallel"
+      blocks:
+        - type: "activity"
+          activityName: "ValidateInput"
+          args:
+            - "user_data"
+        - type: "activity"
+          activityName: "CheckPermissions"
+          args:
+            - "user_permissions"
+        - type: "activity"
+          activityName: "VerifyResources"
+          args:
+            - "system_resources"
+    
+    # Approval with validation results
+    - type: "activity"
+      activityName: "RequestApproval"
+      args:
+        - "workflow_execution"
+    
+    # Main execution phase with data flow within each pipeline
+    - type: "parallel"
+      blocks:
+        # Data processing pipeline with sequential data flow
+        - type: "sequential"
+          blocks:
+            - type: "activity"
+              activityName: "RequestHumanApproval"
+              args:
+                - "ExtractData"
+            - type: "activity"
+              activityName: "ExtractData"
+              args:
+                - "source_system"
+            - type: "activity"
+              activityName: "RequestHumanApproval"
+              args:
+                - "TransformData"
+            - type: "activity"
+              activityName: "TransformData"
+              args:
+                - "transformation_rules"
+            - type: "activity"
+              activityName: "RequestHumanApproval"
+              args:
+                - "LoadData"
+            - type: "activity"
+              activityName: "LoadData"
+              args:
+                - "target_system"
+        
+        # Notification and monitoring pipeline with data flow
+        - type: "sequential"
+          blocks:
+            - type: "activity"
+              activityName: "SendStartNotification"
+              args:
+                - "stakeholders"
+            - type: "parallel"
+              blocks:
+                - type: "activity"
+                  activityName: "MonitorProgress"
+                  args:
+                    - "monitoring_config"
+                - type: "activity"
+                  activityName: "LogMetrics"
+                  args:
+                    - "metrics_config"
+            - type: "activity"
+              activityName: "SendProgressUpdate"
+              args:
+                - "progress_report"
+        
+        # Quality assurance pipeline with data flow
+        - type: "sequential"
+          blocks:
+            - type: "activity"
+              activityName: "RequestHumanApproval"
+              args:
+                - "RunQualityChecks"
+            - type: "activity"
+              activityName: "RunQualityChecks"
+              args:
+                - "quality_criteria"
+            - type: "activity"
+              activityName: "RequestHumanApproval"
+              args:
+                - "GenerateQualityReport"
+            - type: "activity"
+              activityName: "GenerateQualityReport"
+              args:
+                - "quality_results"
+    
+    # Final approval with all pipeline results
+    - type: "activity"
+      activityName: "RequestHumanApproval"
+      args:
+        - "FinalCleanupAndReporting"
+    
+    # Final cleanup and reporting with accumulated data
+    - type: "parallel"
+      blocks:
+        - type: "activity"
+          activityName: "CleanupResources"
+          args:
+            - "temp_resources"
+        - type: "activity"
+          activityName: "GenerateFinalReport"
+          args:
+            - "execution_summary"
+        - type: "activity"
+          activityName: "SendCompletionNotification"
+          args:
+            - "completion_status"
+            - "stakeholders"

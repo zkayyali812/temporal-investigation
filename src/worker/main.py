@@ -31,6 +31,27 @@ async def main():
             request_human_approval,
             execute_agent_task,
             cleanup_task,
+            # Base workflow activities
+            generate_report,
+            send_notification,
+            # Complex workflow activities
+            initialize_workflow,
+            validate_input,
+            check_permissions,
+            verify_resources,
+            request_approval,
+            extract_data,
+            transform_data,
+            load_data,
+            send_start_notification,
+            monitor_progress,
+            log_metrics,
+            send_progress_update,
+            run_quality_checks,
+            generate_quality_report,
+            cleanup_resources,
+            generate_final_report,
+            send_completion_notification,
         ],
     )
     logging.info(f"Worker started for task queue '{TASK_QUEUE}'. Waiting for tasks...")

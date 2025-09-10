@@ -1,0 +1,114 @@
+# Complex workflow example demonstrating nested parallel and sequential blocks
+workflowName: "Complex Multi-Stage Workflow"
+execution:
+  type: "sequential"
+  blocks:
+    # Initial setup phase
+    - type: "activity"
+      activityName: "InitializeWorkflow"
+      args:
+        - "complex-workflow-v1"
+    
+    # Parallel validation phase
+    - type: "parallel"
+      blocks:
+        - type: "activity"
+          activityName: "ValidateInput"
+          args:
+            - "user_data"
+        - type: "activity"
+          activityName: "CheckPermissions"
+          args:
+            - "user_permissions"
+        - type: "activity"
+          activityName: "VerifyResources"
+          args:
+            - "system_resources"
+    
+    # Main execution phase with nested parallel/sequential blocks
+    - type: "parallel"
+      blocks:
+        # Data processing pipeline
+        - type: "sequential"
+          blocks:
+            - type: "activity"
+              activityName: "RequestHumanApproval"
+              args:
+                - "ExtractData"
+            - type: "activity"
+              activityName: "ExtractData"
+              args:
+                - "source_system"
+            - type: "activity"
+              activityName: "RequestHumanApproval"
+              args:
+                - "TransformData"
+            - type: "activity"
+              activityName: "TransformData"
+              args:
+                - "transformation_rules"
+            - type: "activity"
+              activityName: "RequestHumanApproval"
+              args:
+                - "LoadData"
+            - type: "activity"
+              activityName: "LoadData"
+              args:
+                - "target_system"
+        
+        # Notification and monitoring pipeline
+        - type: "sequential"
+          blocks:
+            - type: "activity"
+              activityName: "SendStartNotification"
+              args:
+                - "stakeholders"
+            - type: "parallel"
+              blocks:
+                - type: "activity"
+                  activityName: "MonitorProgress"
+                  args:
+                    - "monitoring_config"
+                - type: "activity"
+                  activityName: "LogMetrics"
+                  args:
+                    - "metrics_config"
+            - type: "activity"
+              activityName: "SendProgressUpdate"
+              args:
+                - "progress_report"
+        
+        # Quality assurance pipeline
+        - type: "sequential"
+          blocks:
+            - type: "activity"
+              activityName: "RunQualityChecks"
+              args:
+                - "quality_criteria"
+            - type: "activity"
+              activityName: "GenerateQualityReport"
+              args:
+                - "quality_results"
+    
+    # Final approval before cleanup and reporting
+    - type: "activity"
+      activityName: "RequestHumanApproval"
+      args:
+        - "FinalCleanupAndReporting"
+    
+    # Final cleanup and reporting
+    - type: "parallel"
+      blocks:
+        - type: "activity"
+          activityName: "CleanupResources"
+          args:
+            - "temp_resources"
+        - type: "activity"
+          activityName: "GenerateFinalReport"
+          args:
+            - "execution_summary"
+        - type: "activity"
+          activityName: "SendCompletionNotification"
+          args:
+            - "completion_status"
+            - "stakeholders"
