@@ -1,2 +1,6 @@
 temporalio
+pytest
 pytest-asyncio
+pytest-mock
+pyyaml
+black
