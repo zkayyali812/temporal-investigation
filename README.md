@@ -171,3 +171,4 @@ Temporal provides robust auditability by design, centered around the immutable e
 ### What does a workflow definition model look like?
 
 By default a workflow definition is structured as code, but we can extend this to a driver based approach, where the workflow is codified in JSON/YAML, and executed.
+An example of this is shown with the [run_dynamic_workflow.py](run_dynamic_workflow.py) file, and its associated [workflow definition](workflow_definition).

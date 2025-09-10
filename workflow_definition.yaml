@@ -1,0 +1,19 @@
+# workflow_definition.yaml
+workflowName: "Dynamic Workflow Example"
+activities:
+  - activityName: "CheckPolicy"
+    args:
+      - "John Doe"
+      - "john.doe@example.com"
+      # - "forbidden: if uncommented, the workflow will be denied by the policy"
+  - activityName: "RequestHumanApproval"
+    args:
+      - "ExecuteAgentTask"
+  - activityName: "ExecuteAgentTask"
+    args:
+      - "john.doe@example.com"
+      - "cus_123456789"
+  - activityName: "CleanupTask"
+    args:
+      - "john.doe@example.com"
+      - "cus_123456789"

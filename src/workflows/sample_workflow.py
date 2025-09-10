@@ -1,14 +1,16 @@
 import asyncio
 from datetime import timedelta
+
 from temporalio import workflow
 from temporalio.common import RetryPolicy
 
 from src.activities.activities import (
     check_policy,
-    request_human_approval,
-    execute_agent_task,
     cleanup_task,
+    execute_agent_task,
+    request_human_approval,
 )
+
 
 @workflow.defn
 class SampleWorkflow:
@@ -28,46 +30,20 @@ class SampleWorkflow:
         # 1. Policy Engine Governance
         # The activity is executed with a retry policy. If it fails due to
         # a transient error, Temporal will retry it automatically.
-        policy_result = await workflow.execute_activity(
+        await workflow.execute_activity(
             check_policy,
             task_description,
             start_to_close_timeout=timedelta(seconds=10),
             retry_policy=RetryPolicy(maximum_attempts=3),
         )
 
-        if policy_result != "approve":
-            workflow.logger.warning("Workflow terminated due to policy denial.")
-            return "TERMINATED_POLICY_DENIAL"
-
         # 2. Human-in-the-Loop Approval
+        # This activity will not complete on return, so the workflow will wait for the human approval signal.
         await workflow.execute_activity(
             request_human_approval,
             task_description,
             start_to_close_timeout=timedelta(seconds=10),
         )
-
-        workflow.logger.info(
-            "Workflow is now waiting for a human approval signal..."
-            "This demonstrates statefulness. The worker could be restarted here "
-            "and the workflow would resume waiting."
-        )
-        
-        try:
-            # Wait for the human_approval_signal to be called.
-            # We add a timeout to prevent the workflow from waiting forever.
-            await workflow.wait_condition(
-                lambda: self._human_approved is not None, timeout=timedelta(minutes=30)
-            )
-        except asyncio.TimeoutError:
-            workflow.logger.error("Timed out waiting for human approval.")
-            return "TERMINATED_TIMEOUT"
-
-
-        if not self._human_approved:
-            workflow.logger.warning(f"Workflow terminated due to human rejection. Reason: {self._rejection_reason}")
-            return f"TERMINATED_REJECTED: {self._rejection_reason}"
-
-        workflow.logger.info("Human approval received. Proceeding with execution.")
 
         # 3. Core Workflow Execution (Agent Task)
         # This is the main task. It's also given a long timeout and retries.
@@ -98,4 +74,3 @@ class SampleWorkflow:
         """
         self._human_approved = approved
         self._rejection_reason = reason
-
